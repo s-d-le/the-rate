@@ -1,6 +1,26 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import "./App.css";
 import CurrencyList from "currency-list";
+
+interface ICurrencyDropDown {
+  currencyList: {};
+  selectedCurrency: string;
+}
+
+const CurrencyDropDown: FC<ICurrencyDropDown> = ({
+  currencyList,
+  selectedCurrency,
+}) => {
+  return (
+    <select value={selectedCurrency}>
+      {Object.keys(currencyList).map((keyName) => (
+        <option key={keyName} value="keyName">
+          {keyName}
+        </option>
+      ))}
+    </select>
+  );
+};
 
 function App() {
   const [base, setBase] = useState<string>("");
@@ -9,22 +29,14 @@ function App() {
 
   const currencyList = CurrencyList.getAll("en_US");
 
-  const currencyDropDown = () => {
-    return (
-      <>
-        {Object.keys(currencyList).map((keyName) => (
-          <li className="travelcompany-input" key={keyName}>
-            <span className="input-label">Name: {keyName}</span>
-          </li>
-        ))}
-      </>
-    );
-  };
+  const setCurrency = () => {};
 
   return (
     <div className="App">
-      <h1>Hello there</h1>
-      {currencyDropDown()}
+      <h1>Base</h1>
+      <CurrencyDropDown currencyList={currencyList} selectedCurrency={base} />
+      <h1>Target</h1>
+      <CurrencyDropDown currencyList={currencyList} selectedCurrency={target} />
     </div>
   );
 }
