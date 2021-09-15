@@ -41,8 +41,12 @@ function App() {
   const sendIt = async () => {
     try {
       await fetch(exchangeRate)
-        .then((response) => console.log(response))
-        .then((data) => console.log(data));
+        .then((response) => response.json())
+        .then((data) =>
+          console.log(
+            data["Realtime Currency Exchange Rate"]["5. Exchange Rate"]
+          )
+        );
     } catch (error) {
       console.log("😱 Error: ", error);
     }
