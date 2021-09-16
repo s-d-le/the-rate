@@ -37,14 +37,7 @@ function App() {
   const [targetAmount, setTargetAmount] = useState<number>(0);
   const [rate, setRate] = useState<number>(1); //Let's not multiply by zero
   const [fxData, setFxData] = useState<{}>({}); //Pull stuff from FX_DAILY
-  // const [chartData, setChartData] = useState<(string | number)[][]>(["day", "low", "open", "close", "high"]);
-  const [chartData, setChartData] = useState<(string | number)[][]>([
-    "day",
-    "low",
-    "open",
-    "close",
-    "high",
-  ]); //2D array for GG chartdata
+  const [chartData, setChartData] = useState<Array<string[] | number[]>>([]); //2D array for GG chartdata
 
   const exchangeRate = `${process.env.REACT_APP_ALPHA_URL}/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${baseCurrency}&to_currency=${targetCurrency}&apikey=${process.env.REACT_APP_ALPHA_KEY}`;
   const timeSeries = `${process.env.REACT_APP_ALPHA_URL}/query?function=FX_DAILY&from_symbol=${baseCurrency}&to_symbol=${targetCurrency}&apikey=${process.env.REACT_APP_ALPHA_KEY}`;
@@ -62,7 +55,9 @@ function App() {
    * ]
    */
   const chartSorting = (fxData: {}) => {
-    let chartArray: (string | number)[][] = [];
+    let chartArray: Array<string[] | number[]> = [
+      ["day", "open", "high", "low", "close"],
+    ];
 
     const objectArray = Object.entries(fxData);
 
@@ -71,11 +66,11 @@ function App() {
       // @ts-ignore
       Object.entries(rateObject).forEach(([key, rate]) => {
         // @ts-ignore
-        chartArray[index].push(rate);
+        chartArray[index + 1].push(parseFloat(rate));
       });
     });
 
-    console.log([["day", "low", "open", "close", "high"], chartArray]);
+    console.log(chartArray);
     setChartData(chartArray);
   };
 
@@ -155,28 +150,23 @@ function App() {
           setTargetCurrency(event.target.value);
         }}
       />
-      <button onClick={sendIt}>Get rate</button>
+      <button onClick={sendIt}>Convert</button>
       <h1>
         {isNaN(targetAmount) || rate === 1 ? null : targetAmount.toFixed(2)}
       </h1>
-      <Chart
-        width={"100%"}
-        height={350}
-        chartType="CandlestickChart"
-        loader={<div>Loading Chart</div>}
-        data={[
-          ["day", "low", "open", "close", "high"],
-          ["Mon", 20, 28, 38, 45],
-          ["Tue", 31, 38, 55, 66],
-          ["Wed", 50, 55, 77, 80],
-          ["Thu", 77, 77, 66, 50],
-          ["Fri", 68, 66, 22, 15],
-        ]}
-        options={{
-          legend: "none",
-        }}
-        rootProps={{ "data-testid": "1" }}
-      />
+      {chartData.length > 1 && (
+        <Chart
+          width={"100%"}
+          height={350}
+          chartType="CandlestickChart"
+          loader={<div>Loading Chart</div>}
+          data={chartData}
+          options={{
+            legend: "none",
+          }}
+          rootProps={{ "data-testid": "1" }}
+        />
+      )}
     </div>
   );
 }
