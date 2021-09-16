@@ -55,22 +55,22 @@ function App() {
    * ]
    */
   const chartSorting = (fxData: {}) => {
+    // Columns heading
     let chartArray: Array<string[] | number[]> = [
       ["day", "open", "high", "low", "close"],
     ];
 
-    const objectArray = Object.entries(fxData);
-
-    objectArray.forEach(([date, rateObject], index) => {
+    // Turn chart object into 2D chart array
+    Object.entries(fxData).forEach(([date, rateObject], index) => {
       chartArray.push([date]);
       // @ts-ignore
       Object.entries(rateObject).forEach(([key, rate]) => {
         // @ts-ignore
+        // Skip the first row as it is the columns heading
         chartArray[index + 1].push(parseFloat(rate));
       });
     });
 
-    console.log(chartArray);
     setChartData(chartArray);
   };
 
