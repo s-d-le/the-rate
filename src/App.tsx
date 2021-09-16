@@ -1,6 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import "./App.css";
 import CurrencyList from "currency-list";
+import Chart from "react-google-charts";
 
 interface ICurrencyDropDown {
   placeholder: string;
@@ -35,17 +36,73 @@ function App() {
   const [targetCurrency, setTargetCurrency] = useState<string>("");
   const [targetAmount, setTargetAmount] = useState<number>(0);
   const [rate, setRate] = useState<number>(1); //Let's not multiply by zero
-  const exchangeRate = `${process.env.REACT_APP_ALPHA_URL}/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${baseCurrency}&to_currency=${targetCurrency}&apikey=${process.env.REACT_APP_ALPHA_KEY}`;
+  const [fxData, setFxData] = useState<{}>({}); //Pull stuff from FX_DAILY
+  // const [chartData, setChartData] = useState<(string | number)[][]>(["day", "low", "open", "close", "high"]);
+  const [chartData, setChartData] = useState<(string | number)[][]>([
+    "day",
+    "low",
+    "open",
+    "close",
+    "high",
+  ]); //2D array for GG chartdata
 
+  const exchangeRate = `${process.env.REACT_APP_ALPHA_URL}/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${baseCurrency}&to_currency=${targetCurrency}&apikey=${process.env.REACT_APP_ALPHA_KEY}`;
+  const timeSeries = `${process.env.REACT_APP_ALPHA_URL}/query?function=FX_DAILY&from_symbol=${baseCurrency}&to_symbol=${targetCurrency}&apikey=${process.env.REACT_APP_ALPHA_KEY}`;
+
+  /**
+   * Get iso currency list from the npm package
+   */
   const currencyList = CurrencyList.getAll("en_US");
 
+  /**
+   * Cooking the FX data for chart
+   * GG candle chart requires a 2d array for data
+   * [
+   *  [],[]
+   * ]
+   */
+  const chartSorting = (fxData: {}) => {
+    let chartArray: (string | number)[][] = [];
+
+    const objectArray = Object.entries(fxData);
+
+    objectArray.forEach(([date, rateObject], index) => {
+      chartArray.push([date]);
+      // @ts-ignore
+      Object.entries(rateObject).forEach(([key, rate]) => {
+        // @ts-ignore
+        chartArray[index].push(rate);
+      });
+    });
+
+    console.log([["day", "low", "open", "close", "high"], chartArray]);
+    setChartData(chartArray);
+  };
+
+  /**
+   * Call Alpha
+   */
   const sendIt = async () => {
+    /**
+     * Get exchange rate
+     */
     try {
       await fetch(exchangeRate)
         .then((response) => response.json()) //need this or we ll just get a promise
         .then((data) =>
           setRate(data["Realtime Currency Exchange Rate"]["5. Exchange Rate"])
         );
+    } catch (error) {
+      console.log("😱 Error: ", error);
+    }
+
+    /**
+     * Get time series
+     */
+    try {
+      await fetch(timeSeries)
+        .then((response) => response.json()) //need this or we ll just get a promise
+        .then((data) => setFxData(data["Time Series FX (Daily)"]));
     } catch (error) {
       console.log("😱 Error: ", error);
     }
@@ -64,6 +121,10 @@ function App() {
   useEffect(() => {
     setTargetAmount(baseAmount * rate);
   }, [baseAmount, rate]);
+
+  useEffect(() => {
+    chartSorting(fxData);
+  }, [fxData]);
 
   return (
     <div className="App">
@@ -98,6 +159,24 @@ function App() {
       <h1>
         {isNaN(targetAmount) || rate === 1 ? null : targetAmount.toFixed(2)}
       </h1>
+      <Chart
+        width={"100%"}
+        height={350}
+        chartType="CandlestickChart"
+        loader={<div>Loading Chart</div>}
+        data={[
+          ["day", "low", "open", "close", "high"],
+          ["Mon", 20, 28, 38, 45],
+          ["Tue", 31, 38, 55, 66],
+          ["Wed", 50, 55, 77, 80],
+          ["Thu", 77, 77, 66, 50],
+          ["Fri", 68, 66, 22, 15],
+        ]}
+        options={{
+          legend: "none",
+        }}
+        rootProps={{ "data-testid": "1" }}
+      />
     </div>
   );
 }
