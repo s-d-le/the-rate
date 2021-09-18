@@ -1,40 +1,8 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.scss";
 import CurrencyList from "currency-list";
 import Chart from "react-google-charts";
-
-interface ICurrencyDropDown {
-  placeholder: string;
-  currencyList: {};
-  selectedCurrency: string;
-  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-}
-
-const CurrencyDropDown: FC<ICurrencyDropDown> = ({
-  placeholder,
-  currencyList,
-  selectedCurrency,
-  onChange,
-}) => {
-  return (
-    <div className="select-container">
-      <select
-        value={selectedCurrency}
-        onChange={onChange}
-        className="select-list"
-      >
-        <option value="" disabled hidden>
-          {placeholder}
-        </option>
-        {Object.keys(currencyList).map((keyName) => (
-          <option key={keyName} value={keyName}>
-            {keyName}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-};
+import CurrencyDropDown from "./components/CurrencyDropdown";
 
 function App() {
   const [baseCurrency, setBaseCurrency] = useState<string>("EUR");
@@ -171,7 +139,11 @@ function App() {
       </button>
 
       <h1>
-        {isNaN(targetAmount) || rate === 1 ? null : targetAmount.toFixed(2)}
+        {isNaN(targetAmount) || rate === 1
+          ? null
+          : `${baseAmount} ${baseCurrency} = ${targetAmount.toFixed(
+              2
+            )} ${targetCurrency}`}
       </h1>
 
       {chartData.length > 1 && (
