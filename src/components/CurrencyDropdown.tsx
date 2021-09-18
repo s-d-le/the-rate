@@ -19,6 +19,7 @@ const CurrencyDropDown: FC<ICurrencyDropDown> = ({
         value={selectedCurrency}
         onChange={onChange}
         className="select-list"
+        data-testid="dropdown"
       >
         <option value="" disabled hidden>
           {placeholder}
