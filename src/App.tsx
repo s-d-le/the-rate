@@ -129,37 +129,51 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Base</h1>
-      <input
-        type="number"
-        name="base-currency"
-        value={baseAmount}
-        onChange={onTargetAmountChange}
-        className="base-input"
-      />
-      <CurrencyDropDown
-        placeholder="Select your base currency"
-        currencyList={currencyList}
-        selectedCurrency={baseCurrency}
-        onChange={(event) => {
-          event.preventDefault();
-          setBaseCurrency(event.target.value);
-        }}
-      />
-      <h1>Target</h1>
-      <CurrencyDropDown
-        placeholder="Select your target currency"
-        currencyList={currencyList}
-        selectedCurrency={targetCurrency}
-        onChange={(event) => {
-          event.preventDefault();
-          setTargetCurrency(event.target.value);
-        }}
-      />
-      <button onClick={sendIt}>Convert</button>
+      <div className="row">
+        <div className="col">
+          <div className="title">Amount</div>
+          <input
+            type="number"
+            name="base-currency"
+            value={baseAmount}
+            onChange={onTargetAmountChange}
+            className="base-input"
+          />
+        </div>
+        <div className="col">
+          <div className="title">Base</div>
+          <CurrencyDropDown
+            placeholder="Select your base currency"
+            currencyList={currencyList}
+            selectedCurrency={baseCurrency}
+            onChange={(event) => {
+              event.preventDefault();
+              setBaseCurrency(event.target.value);
+            }}
+          />
+        </div>
+        <div className="col">
+          <div className="title">Target</div>
+          <CurrencyDropDown
+            placeholder="Select your target currency"
+            currencyList={currencyList}
+            selectedCurrency={targetCurrency}
+            onChange={(event) => {
+              event.preventDefault();
+              setTargetCurrency(event.target.value);
+            }}
+          />
+        </div>
+      </div>
+
+      <button className="convert-button" onClick={sendIt}>
+        Convert
+      </button>
+
       <h1>
         {isNaN(targetAmount) || rate === 1 ? null : targetAmount.toFixed(2)}
       </h1>
+
       {chartData.length > 1 && (
         <Chart
           width={"100%"}
