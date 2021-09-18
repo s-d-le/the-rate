@@ -15,4 +15,6 @@ REACT_APP_ALPHA_KEY = 'YOUR_KEY'
 REACT_APP_ALPHA_URL =  'https://www.alphavantage.co'
 ```
 
-### yarn start
+### `yarn`
+
+### `yarn start`

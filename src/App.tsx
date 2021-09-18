@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from "react";
-import "./App.css";
+import "./App.scss";
 import CurrencyList from "currency-list";
 import Chart from "react-google-charts";
 
@@ -17,23 +17,29 @@ const CurrencyDropDown: FC<ICurrencyDropDown> = ({
   onChange,
 }) => {
   return (
-    <select value={selectedCurrency} onChange={onChange}>
-      <option value="" disabled hidden>
-        {placeholder}
-      </option>
-      {Object.keys(currencyList).map((keyName) => (
-        <option key={keyName} value={keyName}>
-          {keyName}
+    <div className="select-container">
+      <select
+        value={selectedCurrency}
+        onChange={onChange}
+        className="select-list"
+      >
+        <option value="" disabled hidden>
+          {placeholder}
         </option>
-      ))}
-    </select>
+        {Object.keys(currencyList).map((keyName) => (
+          <option key={keyName} value={keyName}>
+            {keyName}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 };
 
 function App() {
-  const [baseCurrency, setBaseCurrency] = useState<string>("");
+  const [baseCurrency, setBaseCurrency] = useState<string>("EUR");
   const [baseAmount, setBaseAmount] = useState<number>(0);
-  const [targetCurrency, setTargetCurrency] = useState<string>("");
+  const [targetCurrency, setTargetCurrency] = useState<string>("GBP");
   const [targetAmount, setTargetAmount] = useState<number>(0);
   const [rate, setRate] = useState<number>(1); //Let's not multiply by zero
   const [fxData, setFxData] = useState<{}>({}); //Pull stuff from FX_DAILY
@@ -126,10 +132,10 @@ function App() {
       <h1>Base</h1>
       <input
         type="number"
-        name="windspeed"
+        name="base-currency"
         value={baseAmount}
         onChange={onTargetAmountChange}
-        className="autocomplete-input windspeed"
+        className="base-input"
       />
       <CurrencyDropDown
         placeholder="Select your base currency"
